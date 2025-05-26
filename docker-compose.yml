@@ -1,0 +1,26 @@
+version: "3.4"
+
+services:
+    attendees-api:
+        build:
+          context: .
+          dockerfile: Attendees/Dockerfile
+        ports:
+          - 8000:80
+        depends_on:
+          - attendees-sql-server
+        environment:
+          - ConnectionStrings__DefaultConnection=Server=attendees-sql-server;Database=AttendeesDb;User=sa;Password=S3cur3P@ssW0rd!;TrustServerCertificate=True
+
+    attendees-sql-server:
+        image: "mcr.microsoft.com/mssql/server:2022-latest"
+        ports:
+          - 1433:1433
+        environment:
+          - SA_PASSWORD=S3cur3P@ssW0rd!
+          - ACCEPT_EULA=Y
+          - MSSQL_PID=Express
+          - MSSQL_TCP_PORT=1433
+          - DATABASE_NAME=AttendeesDb
+        volumes:
+          - ./init.sql:/docker-entrypoint-initdb.d/init.sql
