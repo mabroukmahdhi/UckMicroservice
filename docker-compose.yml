@@ -1,0 +1,26 @@
+version: "3.4"
+
+services:
+    talks-api:
+        build:
+          context: .
+          dockerfile: Talks/Dockerfile
+        ports:
+          - 8000:80
+        depends_on:
+          - talks-sql-server
+        environment:
+          - ConnectionStrings__DefaultConnection=Server=talks-sql-server;Database=TalksDb;User=sa;Password=S3cur3P@ssW0rd!;TrustServerCertificate=True
+
+    talks-sql-server:
+        image: "mcr.microsoft.com/mssql/server:2022-latest"
+        ports:
+          - 1433:1433
+        environment:
+          - SA_PASSWORD=S3cur3P@ssW0rd!
+          - ACCEPT_EULA=Y
+          - MSSQL_PID=Express
+          - MSSQL_TCP_PORT=1433
+          - DATABASE_NAME=TalksDb
+        volumes:
+          - ./init.sql:/docker-entrypoint-initdb.d/init.sql
